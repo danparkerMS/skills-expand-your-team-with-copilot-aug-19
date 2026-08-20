@@ -32,6 +32,21 @@
   --info-light: #d1ecf1;
 }
 
+body.dark-mode {
+  --background: #121212;
+  --surface: #1e1e1e;
+  --text-primary: #f5f5f5;
+  --text-secondary: #bdbdbd;
+  --border: #424242;
+  --border-light: #333333;
+  --border-focus: #757575;
+  --primary-light: #7c83d1;
+  --success-light: #1b3a1e;
+  --warning-light: #4a3900;
+  --error-light: #4a1c1c;
+  --info-light: #153d43;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -203,6 +218,11 @@ section h3 {
   border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+}
+
+body.dark-mode .activity-tag {
+  background: #30345f;
+  color: #c5c9ff;
 }
 
 /* Capacity Indicator */
@@ -617,6 +637,8 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  gap: 8px;
 }
 
 #user-status {
