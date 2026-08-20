@@ -506,6 +506,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </span>
     `;
 
+    // Create share buttons so students and teachers can share this activity
+    const shareHtml = createShareButtonsHtml(name, details);
+
     // Create capacity indicator
     const capacityIndicator = `
       <div class="capacity-container ${capacityStatusClass}">
@@ -528,6 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
+      ${shareHtml}
       <div class="participants-list">
         <h5>Current Participants:</h5>
         <ul>
@@ -587,7 +591,97 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for the social sharing buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        handleShareButtonClick(button.dataset.shareType, name, details);
+      });
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Build the shareable text and link for an activity
+  function getShareInfo(name, details) {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(
+      name
+    )}`;
+    const shareText = `Check out "${name}" at Mergington High School! ${details.description}`;
+    return { shareUrl, shareText };
+  }
+
+  // Create the HTML for the row of social sharing buttons on an activity card
+  function createShareButtonsHtml(name, details) {
+    return `
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button type="button" class="share-button share-email" data-share-type="email" title="Share via email" aria-label="Share via email">✉️</button>
+        <button type="button" class="share-button share-twitter" data-share-type="twitter" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">🐦</button>
+        <button type="button" class="share-button share-facebook" data-share-type="facebook" title="Share on Facebook" aria-label="Share on Facebook">📘</button>
+        <button type="button" class="share-button share-whatsapp" data-share-type="whatsapp" title="Share on WhatsApp" aria-label="Share on WhatsApp">💬</button>
+        <button type="button" class="share-button share-copy" data-share-type="copy" title="Copy link" aria-label="Copy link">🔗</button>
+      </div>
+    `;
+  }
+
+  // Handle a click on one of the social sharing buttons
+  function handleShareButtonClick(shareType, name, details) {
+    const { shareUrl, shareText } = getShareInfo(name, details);
+
+    switch (shareType) {
+      case "email":
+        window.location.href = `mailto:?subject=${encodeURIComponent(
+          `Join me for ${name}!`
+        )}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+        break;
+      case "twitter":
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            shareText
+          )}&url=${encodeURIComponent(shareUrl)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+        break;
+      case "facebook":
+        window.open(
+          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+            shareUrl
+          )}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+        break;
+      case "whatsapp":
+        window.open(
+          `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+        break;
+      case "copy":
+        copyShareLink(shareUrl);
+        break;
+      default:
+        break;
+    }
+  }
+
+  // Copy the share link to the clipboard and let the user know it worked
+  function copyShareLink(shareUrl) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          showMessage("Link copied to clipboard!", "success");
+        })
+        .catch(() => {
+          showMessage("Could not copy link. Please copy it manually.", "error");
+        });
+    } else {
+      showMessage("Could not copy link. Please copy it manually.", "error");
+    }
   }
 
   // Event listeners for search and filter
